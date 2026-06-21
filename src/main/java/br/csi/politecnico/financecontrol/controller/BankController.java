@@ -6,6 +6,7 @@ import br.csi.politecnico.financecontrol.dto.UserBankDTO;
 import br.csi.politecnico.financecontrol.exception.BadRequestException;
 import br.csi.politecnico.financecontrol.exception.NotFoundException;
 import br.csi.politecnico.financecontrol.service.BankService;
+import br.csi.politecnico.financecontrol.utils.AuthUtil;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDTO.ok(bankService.create(dto)));
         } catch (BadRequestException ex) {
+            ex.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(ex.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -47,6 +49,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(bankService.findAll());
         } catch (NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +62,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(bankService.findById(id)));
         } catch (NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,6 +76,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Atualizado com sucesso!", bankService.update(id, dto)));
         } catch (NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,6 +90,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(bankService.deleteById(id));
         } catch (NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,6 +103,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDTO.ok("Vinculado com sucesso!", bankService.vinculateUserBank(uuid, dto)));
         } catch (BadRequestException | NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,6 +116,7 @@ public class BankController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Deletado com sucesso!", bankService.deleteUserBankById(id)));
         } catch (NotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,11 +134,33 @@ public class BankController {
         }
     }
 
+    @GetMapping("/find-all/links/by-user")
+    public ResponseEntity<List<BankDTO>> findByCurrentUserBanks() {
+        try {
+            String uuid = AuthUtil.getUuid();
+            return ResponseEntity.status(HttpStatus.OK).body(bankService.findUserBankByUuid(uuid));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
     @Secured({"ROLE_ADMIN"})
     @GetMapping("/find-all/links")
     public ResponseEntity<List<UserBankDTO>> findAllLinks() {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(bankService.findAllLinks());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @Secured({"ROLE_USER"})
+    @GetMapping("/find-all/by/{uuid}")
+    public ResponseEntity<List<BankDTO>> findAllBanksByUserUuid(@PathVariable @Valid String uuid) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(bankService.findAllBanksByUserUuid(uuid));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

@@ -5,6 +5,7 @@ import br.csi.politecnico.financecontrol.dto.ResponseDTO;
 import br.csi.politecnico.financecontrol.dto.RevenueDTO;
 import br.csi.politecnico.financecontrol.exception.BadRequestException;
 import br.csi.politecnico.financecontrol.service.TransactionService;
+import br.csi.politecnico.financecontrol.utils.AuthUtil;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAll()));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,6 +43,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDTO.ok("Receita criada com sucesso!", transactionService.createRevenue(revenue)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,6 +56,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findRevenueById(id)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,6 +69,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Receita atualizada com sucesso!", transactionService.updateRevenueById(id, revenue)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -77,6 +82,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Receita deletada com sucesso!", transactionService.deleteRevenueById(id)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,6 +95,21 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllRevenueByUserUuid(uuid)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.err(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/find-all/revenue/by-user")
+    public ResponseEntity<ResponseDTO<List<RevenueDTO>>> findAllRevenueByCurrentUser() {
+        try {
+            String uuid = AuthUtil.getUuid();
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllRevenueByUserUuid(uuid)));
+        } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,6 +122,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllExpenses()));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,6 +135,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(ResponseDTO.ok("Despesa criada com sucesso!", transactionService.createExpense(expense)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,6 +148,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Despesa atualizada com sucesso!", transactionService.updateExpenseById(id, expense)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,6 +161,7 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok("Despesa deletada com sucesso!", transactionService.deleteExpenseById(id)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,7 +174,42 @@ public class TransactionController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllExpensesByUserUuid(uuid)));
         } catch (BadRequestException e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.err(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/find-all/expense/by-user")
+    public ResponseEntity<ResponseDTO<List<ExpenseDTO>>> findAllExpenseByCurrentUser() {
+        try {
+            String uuid = AuthUtil.getUuid();
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllExpensesByUserUuid(uuid)));
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.err(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.err(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/find-all/revenue/by/bank/{bankId}")
+    public ResponseEntity<ResponseDTO<List<RevenueDTO>>> findAllRevenueByBank(@PathVariable @Valid Long bankId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllRevenueByBankId(bankId)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.err(e.getMessage()));
+        }
+    }
+
+    @GetMapping("/find-all/expense/by/bank/{bankId}")
+    public ResponseEntity<ResponseDTO<List<ExpenseDTO>>> findAllExpenseByBank(@PathVariable @Valid Long bankId) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseDTO.ok(transactionService.findAllExpenseByBankId(bankId)));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.err(e.getMessage()));

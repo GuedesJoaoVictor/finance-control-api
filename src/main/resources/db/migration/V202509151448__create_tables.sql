@@ -1,4 +1,3 @@
--- Tabela users
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     uuid CHAR(36) UNIQUE,
@@ -8,14 +7,12 @@ CREATE TABLE users (
     password VARCHAR(255)
 );
 
--- Tabela bank
 CREATE TABLE bank (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(255),
     type VARCHAR(255)
 );
 
--- Tabela category
 CREATE TABLE category (
     id SERIAL PRIMARY KEY NOT NULL,
     type VARCHAR(255),
@@ -24,7 +21,6 @@ CREATE TABLE category (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Tabela user_bank
 CREATE TABLE user_bank (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(255),
@@ -35,7 +31,6 @@ CREATE TABLE user_bank (
     FOREIGN KEY (bank_id) REFERENCES bank(id)
 );
 
--- Tabela revenues (herda de Transaction)
 CREATE TABLE revenues (
     id SERIAL PRIMARY KEY NOT NULL,
     description VARCHAR(255),
@@ -49,7 +44,6 @@ CREATE TABLE revenues (
     FOREIGN KEY (bank_id) REFERENCES bank(id)
 );
 
--- Tabela expenses (herda de Transaction - implícito pelo código Java)
 CREATE TABLE expenses (
     id SERIAL PRIMARY KEY NOT NULL,
     description VARCHAR(255),

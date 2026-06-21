@@ -18,4 +18,12 @@ public class BankDTO {
         this.name = bank.getName();
         this.type = bank.getType();
     }
+
+    public static BankDTO from(Bank bank) {
+        return BankDTO.builder()
+                .id(bank.getId().intValue())
+                .name(bank.getName())
+                .type(bank.getType())
+                .build();
+    }
 }

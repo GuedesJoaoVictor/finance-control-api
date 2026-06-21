@@ -20,11 +20,13 @@ public class BankService {
     private final BankRepository bankRepository;
     private final UserRepository userRepository;
     private final UserBankRepository userBankRepository;
+    private final TransactionService transactionService;
 
-    public BankService(BankRepository bankRepository, UserRepository userRepository, UserBankRepository userBankRepository) {
+    public BankService(BankRepository bankRepository, UserRepository userRepository, UserBankRepository userBankRepository, TransactionService transactionService) {
         this.bankRepository = bankRepository;
         this.userRepository = userRepository;
         this.userBankRepository = userBankRepository;
+        this.transactionService = transactionService;
     }
 
     public BankDTO create(BankDTO dto) {
@@ -139,6 +141,7 @@ public class BankService {
         if (userBank == null) {
             throw new NotFoundException("Vínculo não encontrado.");
         }
+        transactionService.deleteAllByBankId(userBank.getBank().getId());
         userBankRepository.delete(userBank);
         return true;
     }
@@ -159,6 +162,13 @@ public class BankService {
         for (UserBank userBank : userBanks) {
             dtos.add(new UserBankDTO(userBank));
         }
+        return dtos;
+    }
+
+    public List<BankDTO> findAllBanksByUserUuid(String uuid) {
+        List<Bank> banks = bankRepository.findAllBanksByUserUuid(UUID.fromString(uuid));
+        List<BankDTO> dtos = banks.stream().map(BankDTO::from).toList();
+        System.out.println(dtos);
         return dtos;
     }
 

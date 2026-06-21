@@ -9,4 +9,8 @@ import java.util.UUID;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     List<Expense> findAllByUser_Uuid(UUID uuid);
+
+    List<Expense> findAllByBank_IdAndUser_Uuid(Long bankId, UUID userUuid);
+
+    void deleteAllByBank_IdAndUser_Uuid(Long bankId, UUID userUuid);
 }

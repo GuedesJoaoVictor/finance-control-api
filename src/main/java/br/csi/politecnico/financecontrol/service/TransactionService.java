@@ -4,6 +4,7 @@ import br.csi.politecnico.financecontrol.dto.*;
 import br.csi.politecnico.financecontrol.exception.BadRequestException;
 import br.csi.politecnico.financecontrol.model.*;
 import br.csi.politecnico.financecontrol.repository.*;
+import br.csi.politecnico.financecontrol.utils.AuthUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class TransactionService {
     }
 
     public RevenueDTO createRevenue(RevenueDTO revenue) {
-        User user = userRepository.findById(revenue.getUser().getId()).orElse(null);
+        User user = userRepository.findById(AuthUtil.getId()).orElse(null);
         if (user == null) {
             throw new BadRequestException("Usuário não encontrado.");
         }
@@ -129,7 +130,7 @@ public class TransactionService {
     public List<RevenueDTO> findAllRevenueByUserUuid(String uuid) {
         List<Revenue> revenues = revenuesRepository.findAllByUser_Uuid(UUID.fromString(uuid));
         if (revenues.isEmpty()) {
-            throw new BadRequestException("Nenhuma transação encontrada.");
+            return new ArrayList<>();
         }
         List<RevenueDTO> dtos = new ArrayList<>();
         for (Revenue revenue : revenues) {
@@ -169,7 +170,7 @@ public class TransactionService {
     }
 
     public ExpenseDTO createExpense(ExpenseDTO expense) {
-        User user = userRepository.findById(expense.getUser().getId()).orElse(null);
+        User user = userRepository.findById(AuthUtil.getId()).orElse(null);
         if (user == null) {
             throw new BadRequestException("Usuário não encontrado.");
         }
@@ -232,7 +233,7 @@ public class TransactionService {
     public List<ExpenseDTO> findAllExpensesByUserUuid(String uuid) {
         List<Expense> expenses = expenseRepository.findAllByUser_Uuid(UUID.fromString(uuid));
         if (expenses.isEmpty()) {
-            throw new BadRequestException("Nenhuma despesa encontrada.");
+            return new ArrayList<>();
         }
         List<ExpenseDTO> dtos = new ArrayList<>();
         for (Expense expense : expenses) {
@@ -248,6 +249,24 @@ public class TransactionService {
             dtos.add(dto);
         }
         return dtos;
+    }
+
+    public List<RevenueDTO> findAllRevenueByBankId(Long bankId) {
+        String userUuid = AuthUtil.getUuid();
+        List<Revenue> revenues = revenuesRepository.findAllByBank_IdAndUser_Uuid(bankId, UUID.fromString(userUuid));
+        return revenues.stream().map(RevenueDTO::new).toList();
+    }
+
+    public List<ExpenseDTO> findAllExpenseByBankId(Long bankId) {
+        String userUuid = AuthUtil.getUuid();
+        List<Expense> expenses = expenseRepository.findAllByBank_IdAndUser_Uuid(bankId, UUID.fromString(userUuid));
+        return expenses.stream().map(ExpenseDTO::new).toList();
+    }
+
+    public void deleteAllByBankId(Long bankId) {
+        String userUuid = AuthUtil.getUuid();
+        revenuesRepository.deleteAllByBank_IdAndUser_Uuid(bankId, UUID.fromString(userUuid));
+        expenseRepository.deleteAllByBank_IdAndUser_Uuid(bankId, UUID.fromString(userUuid));
     }
 
 }
