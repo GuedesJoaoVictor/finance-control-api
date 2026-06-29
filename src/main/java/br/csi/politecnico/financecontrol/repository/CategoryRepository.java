@@ -8,6 +8,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
+    
+    @Query(nativeQuery = true, value = """
+        SELECT c.* FROM category c
+        LEFT JOIN users u ON u.id = c.user_id
+        WHERE u.uuid = :userUuid OR c.user_id IS NULL
+    """)
+    List<Category> findAllDefaultAndAllByUserUuid(UUID userUuid);
+
     List<Category> findAllByUser_Uuid(UUID userUuid);
 
     @Query(nativeQuery = true, value = """

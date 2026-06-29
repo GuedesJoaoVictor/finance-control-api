@@ -48,10 +48,7 @@ public class CategoryService {
     }
 
     public List<CategoryDTO> findAllByUser(String uuid) {
-        List<Category> categories = categoryRepository.findAllByUser_Uuid(UUID.fromString(uuid));
-//        if (CollectionUtils.isEmpty(categories)) {
-//            throw new NotFoundException("O usuário não tem categorias cadastradas.");
-//        }
+        List<Category> categories = categoryRepository.findAllDefaultAndAllByUserUuid(UUID.fromString(uuid));
         List<CategoryDTO> list = new ArrayList<>();
         for (Category category : categories) {
             list.add(CategoryDTO.builder()
